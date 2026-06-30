@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using Menu = Common.Menu.Menu;
+using OrderPlus.ViewModels;
 
 namespace OrderPlus.Windows
 {
     public class MenuWindow : BaseWindow
     {
+        public MenuViewModel MenuViewModel { get; set; }
+
         private TextBlock WelcomeText { get; set; }
 
-        private Menu TestMenu { get; set; }
-
-        private TextBlock MenuText { get; set; }
-
+        public override void InitializeViewModel()
+        {
+            MenuViewModel = (MenuViewModel)Activator.CreateInstance(typeof(MenuViewModel));
+        }
 
         public override void InitializeWindow()
         {
@@ -24,18 +26,6 @@ namespace OrderPlus.Windows
                 FontSize = 24
             };
             AddToGrid(WelcomeText);
-
-            TestMenu = new Menu();
-            TestMenu.Load();
-
-            MenuText = new TextBlock
-            {
-                Text = TestMenu.Name,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-                FontSize = 24
-            };
-            AddToGrid(MenuText);
 
         }
     }

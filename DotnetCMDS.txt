@@ -1,0 +1,64 @@
+run and build OrderPlus
+dotnet run --project ./OrderPlus/OrderPlus.csproj
+
+Build
+dotnet build
+
+publish exe
+dotnet publish OrderPlus -c Release 
+or
+dotnet publish OrderPlus/OrderPlus.csproj -c Release
+
+
+
+create Solution
+dotnet new sln -n POSPlus
+
+create Project
+dotnet new classlib -o Common
+
+add proj to Solution
+dotnet sln add Common/Common.csproj
+
+reference one proj to another
+dotnet add OrderPls/OrderPls.csproj reference Common/Common.csproj
+
+add db to env variable
+[Environment]::SetEnvironmentVariable("OrderPlus_DB", "Server=localhost\SQLEXPRESS;Database=POSPlus;Trusted_Connection=True;TrustServerCertificate=True;", "User")
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Common.Abstract;
+
+namespace Common.Menu
+{
+    public class MenuSection : Entity
+    {
+        public string Name { get; set; }
+
+        public Guid MenuId { get; set; }
+
+        public MenuSection()
+        {
+        }
+
+        public override void Add(Entity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Remove(Entity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Update(Entity entity)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

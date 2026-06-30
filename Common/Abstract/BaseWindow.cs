@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using OrderPlus.ViewModels;
 
 namespace OrderPlus.Windows
 {
@@ -11,6 +12,7 @@ namespace OrderPlus.Windows
         public BaseWindow()
         {
             GenerateGrid();
+            InitializeViewModel();
             InitializeWindow();
             RegisterEvents();
         }
@@ -24,8 +26,10 @@ namespace OrderPlus.Windows
 
         public void AddToGrid(UIElement e)
         {
-            MainGrid.Children.Add(e);
+            MainGrid.Children.Add(e);  
         }
+
+        public abstract void InitializeViewModel();
 
         public abstract void InitializeWindow();
 

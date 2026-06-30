@@ -1,18 +1,29 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using OrderPlus.ViewModels;
+using Common.Abstract;
 
 namespace OrderPlus.Windows
 {
     public class MainWindow : BaseWindow
     {
+        public MainViewModel MainViewModel { get; set; }
 
         private TextBlock WelcomeText { get; set; }
 
+        private TextBlock MenuText { get; set; }
+
         private Button IdkButton { get; set; }
+
 
         public MainWindow()
         {
+        }
+
+        public override void InitializeViewModel()
+        {
+            MainViewModel = (MainViewModel)Activator.CreateInstance(typeof(MainViewModel));
         }
 
         public override void InitializeWindow()
@@ -26,6 +37,15 @@ namespace OrderPlus.Windows
             };
             AddToGrid(WelcomeText);
 
+            MenuText = new TextBlock
+            {
+                Text = MainViewModel.ActiveMenu.Name,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+                FontSize = 24
+            };
+            AddToGrid(MenuText);
+
             IdkButton = new Button
             {
                 Content = "Go to Next Page",
@@ -36,6 +56,8 @@ namespace OrderPlus.Windows
                 Margin = new Thickness(0, 0, 20, 20)
             };
             AddToGrid(IdkButton);
+
+
         }
 
         public override void RegisterEvents()
@@ -51,5 +73,6 @@ namespace OrderPlus.Windows
             menuWin.Show();
             this.Close();
         }
+
     }
 }
