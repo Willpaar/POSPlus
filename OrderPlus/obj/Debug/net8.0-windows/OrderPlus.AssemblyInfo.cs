@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OrderPlus")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+98d9179783de707f45de1e03448d7940343ccf90")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f5ce6bf30ad1c9f876df1fb90acf4377683bee8d")]
 [assembly: System.Reflection.AssemblyProductAttribute("OrderPlus")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OrderPlus")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
