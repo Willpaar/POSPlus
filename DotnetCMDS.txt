@@ -27,38 +27,4 @@ add db to env variable
 [Environment]::SetEnvironmentVariable("OrderPlus_DB", "Server=localhost\SQLEXPRESS;Database=POSPlus;Trusted_Connection=True;TrustServerCertificate=True;", "User")
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Common.Abstract;
 
-namespace Common.Menu
-{
-    public class MenuSection : Entity
-    {
-        public string Name { get; set; }
-
-        public Guid MenuId { get; set; }
-
-        public MenuSection()
-        {
-        }
-
-        public override void Add(Entity entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Remove(Entity entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Update(Entity entity)
-        {
-            throw new NotImplementedException();
-        }
-    }
-}

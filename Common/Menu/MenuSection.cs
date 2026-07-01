@@ -1,16 +1,15 @@
-using Common.Abstract;
+﻿using Common.Abstract;
 using Common.Helpers;
-using Dapper;
-using Microsoft.Data.SqlClient;
 
-namespace Common.Menu {
-    public class Menu : Entity
+namespace Common.Menu
+{
+    public class MenuSection : Entity
     {
-
         public string Name { get; set; }
-        public bool Active { get; set; }
 
-        public Menu()
+        public Guid MenuId { get; set; }
+
+        public MenuSection()
         {
         }
 
@@ -29,16 +28,16 @@ namespace Common.Menu {
             throw new NotImplementedException();
         }
 
-        public static Menu GetActiveMenu()
+        public static List<MenuSection> GetMenuSections(Menu Menu)
         {
             object parameters = new Dictionary<string, object>
             {
-                { nameof(Active), 1 }
+                { nameof(MenuId), Menu.Id }
             };
 
-            string sql = SQLHelper.BuildQuerySelectAll(nameof(Menu), parameters);
+            string sql = SQLHelper.BuildQuerySelectAll(nameof(MenuSection), parameters);
 
-            return SQLHelper.QueryFirst<Menu>(sql, parameters);
+            return SQLHelper.QueryList<MenuSection>(sql, parameters);
         }
     }
 }

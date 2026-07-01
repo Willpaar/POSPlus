@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Common.Menu;
 using Menu = Common.Menu.Menu;
 
 namespace OrderPlus.ViewModels
@@ -11,9 +12,15 @@ namespace OrderPlus.ViewModels
     {
         public Menu ActiveMenu { get; set; }
 
+        public List<MenuSection> MenuSections { get; set; }
+
         public override void InitializeObjects()
         {
-            if (ActiveMenu == null) ActiveMenu = Menu.GetActiveMenu();
+            //TODO:figure out loading system
+
+            ActiveMenu = Menu.GetActiveMenu();
+
+            MenuSections = MenuSection.GetMenuSections(ActiveMenu);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace OrderPlus.ViewModels
 
         public override void InitializeObjects()
         {
-            if (ActiveMenu == null) ActiveMenu = Menu.GetActiveMenu();
+            ActiveMenu = Menu.GetActiveMenu();
         }
     }
 }
