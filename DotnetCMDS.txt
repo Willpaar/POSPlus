@@ -32,6 +32,6 @@ git rm --cached DotnetCMDS.txt
 
 git rm -r --cached OrderPlus/bin/
 git rm -r --cached OrderPlus/obj/
-git rm -r --cached common/bin/
-git rm -r --cached common/obj/
-git rm -r --cached common/DB Structure/
+git rm -r --cached Common/bin/
+git rm -r --cached Common/obj/
+git rm -r --cached Common/DBStructure/
