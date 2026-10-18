@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Common.Menu;
-using Menu = Common.Menu.Menu;
+using Common.DBEntities;
 
 namespace OrderPlus.ViewModels
 {

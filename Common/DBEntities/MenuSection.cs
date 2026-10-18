@@ -1,7 +1,7 @@
 ﻿using Common.Abstract;
 using Common.Helpers;
 
-namespace Common.Menu
+namespace Common.DBEntities
 {
     public class MenuSection : Entity
     {
@@ -11,21 +11,6 @@ namespace Common.Menu
 
         public MenuSection()
         {
-        }
-
-        public override void Add(Entity entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Remove(Entity entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Update(Entity entity)
-        {
-            throw new NotImplementedException();
         }
 
         public static List<MenuSection> GetMenuSections(Menu Menu)
