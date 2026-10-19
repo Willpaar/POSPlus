@@ -9,8 +9,14 @@ namespace Common.DBEntities
     public class Menu : MenuDataRow
     {
 
-        public override string Name { get; set; }
-        public override bool Active { get; set; }
+        public override string Name { 
+            get => base.Name; 
+            set => base.Name = value; 
+        }
+        public override bool Active { 
+            get => base.Active; 
+            set => base.Active = value; 
+        }
 
         public static Menu GetActiveMenu()
         {
@@ -19,9 +25,7 @@ namespace Common.DBEntities
                 { nameof(Active), 1 }
             };
 
-            string sql = SQLHelper.BuildQuerySelectAll(nameof(Menu), parameters);
-
-            return SQLHelper.QueryFirst<Menu>(sql, parameters);
+            return SQLHelper.QueryFirst<Menu>(parameters);
         }
 
     }

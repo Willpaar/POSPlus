@@ -120,7 +120,7 @@ catch {
     exit
 }
 
-# --- RELATIONSHIP ANALYSIS (STRICTLY FROM FK CONSTRAINTS) ---
+# --- RELATIONSHIP ANALYSIS (STRICTLY FROM FK CONSTRAINTS WITH DUPLICATE PREVENTION) ---
 $entityRelations = @{}
 foreach ($tableName in $tables.Keys) {
     $entityRelations[$tableName] = @{ Parents = @(); Children = @(); ManyToMany = @() }
@@ -138,10 +138,15 @@ foreach ($match in $tableMatches) {
         $parentTable = $fk.Groups[2].Value
 
         if ($tables.Contains($parentTable) -and $parentTable -ne $tableName) {
-            $entityRelations[$tableName].Parents += [PSCustomObject]@{
-                ParentTable = $parentTable
-                ForeignKeyCol = $colName
+            # Prevent duplicate parent additions
+            $existingParent = $entityRelations[$tableName].Parents | Where-Object { $_.ParentTable -eq $parentTable -and $_.ForeignKeyCol -eq $colName }
+            if (!$existingParent) {
+                $entityRelations[$tableName].Parents += [PSCustomObject]@{
+                    ParentTable = $parentTable
+                    ForeignKeyCol = $colName
+                }
             }
+
             if (!($entityRelations[$parentTable].Children -contains $tableName)) {
                 $entityRelations[$parentTable].Children += $tableName
             }
@@ -164,8 +169,16 @@ foreach ($link in $linkTables) {
         $t1 = $refTables[0]
         $t2 = $refTables[1]
         
-        $entityRelations[$t1].ManyToMany += [PSCustomObject]@{ TargetTable = $t2; LinkTable = $link.TableName }
-        $entityRelations[$t2].ManyToMany += [PSCustomObject]@{ TargetTable = $t1; LinkTable = $link.TableName }
+        # Prevent duplicate many-to-many additions
+        $existingM2M1 = $entityRelations[$t1].ManyToMany | Where-Object { $_.TargetTable -eq $t2 -and $_.LinkTable -eq $link.TableName }
+        if (!$existingM2M1) {
+            $entityRelations[$t1].ManyToMany += [PSCustomObject]@{ TargetTable = $t2; LinkTable = $link.TableName }
+        }
+
+        $existingM2M2 = $entityRelations[$t2].ManyToMany | Where-Object { $_.TargetTable -eq $t1 -and $_.LinkTable -eq $link.TableName }
+        if (!$existingM2M2) {
+            $entityRelations[$t2].ManyToMany += [PSCustomObject]@{ TargetTable = $t1; LinkTable = $link.TableName }
+        }
     }
 }
 
@@ -182,31 +195,55 @@ foreach ($tableName in $tables.Keys) {
         [void]$sbDataRow.AppendLine("using System.Linq;")
         [void]$sbDataRow.AppendLine("using Common.Abstract;")
         [void]$sbDataRow.AppendLine("namespace Common.DBEntities.DataRowEntities")
-        [void]$sbDataRow.AppendLine()
         [void]$sbDataRow.AppendLine("{")
+        [void]$sbDataRow.AppendLine()
+        [void]$sbDataRow.AppendLine("    /*")
+        [void]$sbDataRow.AppendLine("    This File Is auto-generated from GenerateFromDB.ps1")
+        [void]$sbDataRow.AppendLine("    It is created to mimic the DB structure exactly")
+        [void]$sbDataRow.AppendLine("    DO NOT MAKE ANY CHANGES TO THIS FILE")
+        [void]$sbDataRow.AppendLine("    */")
+        [void]$sbDataRow.AppendLine()
         [void]$sbDataRow.AppendLine("    public class $dataRowClassName : Entity")
         [void]$sbDataRow.AppendLine("    {")
 
         foreach ($col in $columns) {
-            if ($col.Name -eq "Id") { continue }
-            [void]$sbDataRow.AppendLine("        public virtual $($col.Type) $($col.Name) { get; set; }")
-        }
+                    if ($col.Name -eq "Id") { continue }
+            
+                    $colName = $col.Name
+                    $colType = $col.Type
+                    $privateFieldName = "_$($colName.Substring(0,1).ToLower())$($colName.Substring(1))"
 
+                    [void]$sbDataRow.AppendLine("        private $colType $privateFieldName;")
+                    [void]$sbDataRow.AppendLine("        public virtual $colType $colName")
+                    [void]$sbDataRow.AppendLine("        {")
+                    [void]$sbDataRow.AppendLine("            get => $privateFieldName;")
+                    [void]$sbDataRow.AppendLine("            set => SetField(ref $privateFieldName, value);")
+                    [void]$sbDataRow.AppendLine("        }")
+                    [void]$sbDataRow.AppendLine()
+                }
+
+        # 1. Parents (Generic GetFKEntity)
         foreach ($parentObj in $rels.Parents) {
             $parent = $parentObj.ParentTable
             $fkCol = $parentObj.ForeignKeyCol
-            [void]$sbDataRow.AppendLine("        public virtual $parent $parent => ($parent)GetFKEntity(nameof($parent), $fkCol);")
+            [void]$sbDataRow.AppendLine("        private $parent _$parent;")
+            [void]$sbDataRow.AppendLine("        public virtual $parent $parent => _$parent ??= GetFKEntity<$parent>($fkCol);")
         }
 
+        # 2. Children (Generic GetFKEntities with foreign key column name e.g. "MenuId")
         foreach ($child in $rels.Children) {
-            [void]$sbDataRow.AppendLine("        public virtual List<$child> ${child}s => GetFKEntities(nameof($child), Id).Cast<$child>().ToList();")
+            $fkColName = "${tableName}Id"
+            [void]$sbDataRow.AppendLine("        private List<$child> _${child}s;")
+            [void]$sbDataRow.AppendLine("        public virtual List<$child> ${child}s => _${child}s ??= GetFKEntities<$child>(""$fkColName"", Id);")
         }
 
+        # 3. Many-to-Many (Generic GetLinkedEntities using nameof)
         foreach ($m2m in $rels.ManyToMany) {
             $target = $m2m.TargetTable
             $linkTbl = $m2m.LinkTable
             $linkBase = $linkTbl -replace 'Link$', ''
-            [void]$sbDataRow.AppendLine("        public virtual List<$target> ${target}s => GetLinkedEntities<$target>(nameof($linkBase), Id).Cast<$target>().ToList();")
+            [void]$sbDataRow.AppendLine("        private List<$target> _${target}s;")
+            [void]$sbDataRow.AppendLine("        public virtual List<$target> ${target}s => _${target}s ??= GetLinkedEntities<$target>(nameof($linkBase), Id);")
         }
 
         [void]$sbDataRow.AppendLine()

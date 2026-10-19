@@ -1,13 +1,14 @@
 ﻿using Common.Abstract;
+using Common.DBEntities.DataRowEntities;
 using Common.Helpers;
 
 namespace Common.DBEntities
 {
-    public class MenuSection : Entity
+    public class MenuSection : MenuSectionDataRow
     {
-        public string Name { get; set; }
+        public override string Name { get; set; }
 
-        public Guid MenuId { get; set; }
+        public override Guid MenuId { get; set; }
 
         public MenuSection()
         {
@@ -20,9 +21,7 @@ namespace Common.DBEntities
                 { nameof(MenuId), Menu.Id }
             };
 
-            string sql = SQLHelper.BuildQuerySelectAll(nameof(MenuSection), parameters);
-
-            return SQLHelper.QueryList<MenuSection>(sql, parameters);
+            return SQLHelper.QueryList<MenuSection>(parameters);
         }
     }
 }
