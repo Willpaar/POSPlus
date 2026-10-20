@@ -68,7 +68,7 @@ namespace Common.Abstract
         protected T? GetFKEntity<T>(Guid? fkId) where T : Entity
         {
             if (!fkId.HasValue || fkId.Value == Guid.Empty) return null;
-            return SQLHelper.QueryFirst<T>(new { Id = fkId.Value });
+            return SQLHelper.QueryFirst<T>(new Dictionary<string, object?> { { nameof(Id), fkId.Value } });
         }
 
         protected List<T> GetFKEntities<T>(string foreignKeyColumnName, Guid parentId) where T : Entity
@@ -89,7 +89,7 @@ namespace Common.Abstract
                         INNER JOIN {linkTableName} ON {targetTable}.Id = {linkTableName}.{targetTable}Id 
                         WHERE {linkTableName}.{TableName}Id = @Id";
 
-            return SQLHelper.QueryRaw<T>(sql, new { Id = entityId });
+            return SQLHelper.QueryRaw<T>(sql, new Dictionary<string, object?> { { nameof(Id), entityId } });
         }
 
     }

@@ -20,7 +20,7 @@ namespace Common.DBEntities
 
         public static Menu GetActiveMenu()
         {
-            object parameters = new Dictionary<string, object>
+            var parameters = new Dictionary<string, object>
             {
                 { nameof(Active), 1 }
             };

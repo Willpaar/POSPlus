@@ -38,6 +38,14 @@ namespace OrderPlus.Windows
             this.PreviewKeyDown += BaseWindow_PreviewKeyDown;
         }
 
+        public void OpenNewWindow<T>() where T : BaseWindow
+        {
+            T newWindow = (T)Activator.CreateInstance(typeof(T))!;
+
+            newWindow.Show();
+            this.Close();
+        }
+
         private void BaseWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F11)

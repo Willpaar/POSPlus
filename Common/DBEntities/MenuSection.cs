@@ -16,7 +16,7 @@ namespace Common.DBEntities
 
         public static List<MenuSection> GetMenuSections(Menu Menu)
         {
-            object parameters = new Dictionary<string, object>
+            var parameters = new Dictionary<string, object?>
             {
                 { nameof(MenuId), Menu.Id }
             };

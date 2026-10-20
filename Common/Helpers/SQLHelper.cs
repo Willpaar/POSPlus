@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using Common.Abstract;
 using Common.Constants;
@@ -65,29 +66,40 @@ namespace Common.Helpers
             });
         }
 
-
-        public static T? QueryFirst<T>(object? parameters = null) where T : Entity
+        public static T? QueryFirst<T>(Dictionary<string, object?>? parameters = null) where T : Entity
         {
+            var cacheResults = Context.PM.FindAllLocalByParams<T>(parameters);
+            if(cacheResults.Count >= 1) return cacheResults.FirstOrDefault();
+
             return GetAndRunQuery<T>(parameters).FirstOrDefault();
         }
 
-        public static List<T> QueryList<T>(object? parameters = null) where T : Entity
+        public static List<T> QueryList<T>(Dictionary<string, object?>?  parameters = null) where T : Entity
         {
+            var cacheResults = Context.PM.FindAllLocalByParams<T>(parameters);
+            if(cacheResults.Count != 0) return cacheResults;
+
             return GetAndRunQuery<T>(parameters).ToList();
         }
 
-        public static List<T> QueryRaw<T>(string sql, object? parameters = null) where T : Entity
+        public static List<T> QueryRaw<T>(string sql, Dictionary<string, object?>?  parameters = null) where T : Entity
         {
+            //I dont like this but we are going to stick with it until I figure out joins
+            var cacheResults = Context.PM.FindAllLocalByParams<T>(parameters);
+            if (cacheResults.Count != 0) return cacheResults;
+
+
             return Initialize(UseConnection(db => db.Query<T>(sql, parameters))).ToList();
         }
 
-        private static IEnumerable<T> GetAndRunQuery<T>(object? parameters = null) where T : Entity
+        private static IEnumerable<T> GetAndRunQuery<T>(Dictionary<string, object?>?  parameters = null) where T : Entity
         {
             var sql = BuildQuerySelectAll(EntityConsts.CorrectTableName<T>(), parameters);
-            return Initialize(UseConnection(db => db.Query<T>(sql, parameters)));
+            return Initialize((UseConnection(db => db.Query<T>(sql, parameters))));
         }
         private static IEnumerable<T> Initialize<T>(IEnumerable<T> entities) where T : Entity
         {
+            //all entities coming from the DB should be set to unchanged hopefully wont cause problems
             foreach(var e in entities)
             {
                 e.RowState = RowStateType.Unchanged;
@@ -97,7 +109,7 @@ namespace Common.Helpers
             return entities;
         }
 
-        private static string BuildQuerySelectAll(string tablename, object? parameters = null)
+        private static string BuildQuerySelectAll(string tablename, Dictionary<string, object?>?  parameters = null)
         {
             var sql = $"SELECT {tablename}.* FROM {tablename}\n";
 
@@ -115,7 +127,7 @@ namespace Common.Helpers
             return ""; //TODO: Create enitity relations for joins
         }
 
-        private static string AddWhere(string tablename, object parameters)
+        private static string AddWhere(string tablename, Dictionary<string, object?>? parameters)
         {
             IEnumerable<string> propertyNames;
 

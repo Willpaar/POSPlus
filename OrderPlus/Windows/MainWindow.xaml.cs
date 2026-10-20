@@ -12,9 +12,7 @@ namespace OrderPlus.Windows
 
         private TextBlock WelcomeText { get; set; }
 
-        private TextBlock MenuText { get; set; }
-
-        private Button IdkButton { get; set; }
+        private Button LoginButton { get; set; }
 
 
         public MainWindow()
@@ -32,30 +30,22 @@ namespace OrderPlus.Windows
             {
                 Text = "Welcome to OrderPlus!",
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Top,
                 FontSize = 24
             };
             AddToGrid(WelcomeText);
 
-            MenuText = new TextBlock
-            {
-                Text = MainViewModel.ActiveMenu.Name,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-                FontSize = 24
-            };
-            AddToGrid(MenuText);
 
-            IdkButton = new Button
+            LoginButton = new Button
             {
-                Content = "Go to Next Page",
+                Content = "Login",
                 Width = 150,
                 Height = 35,
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment = VerticalAlignment.Bottom,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(0, 0, 20, 20)
             };
-            AddToGrid(IdkButton);
+            AddToGrid(LoginButton);
 
 
         }
@@ -64,14 +54,12 @@ namespace OrderPlus.Windows
         {
             base.RegisterEvents();
 
-            IdkButton.Click += NavButton_Click;
+            LoginButton.Click += Loginbtn_clk;
         }
 
-        private void NavButton_Click(object sender, RoutedEventArgs e)
+        private void Loginbtn_clk(object sender, RoutedEventArgs e)
         {
-            MenuWindow menuWin = new MenuWindow();
-            menuWin.Show();
-            this.Close();
+            OpenNewWindow<MenuWindow>();
         }
 
     }

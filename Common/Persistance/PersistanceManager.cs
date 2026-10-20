@@ -6,11 +6,50 @@ namespace Common.Persistance
 {
     public class PersistanceManager
     {
-        internal List<Entity> Entities { get; set; } = new List<Entity>();
-
-        public void InsertToEntities(Entity e)
+        private List<Entity> Entities { get; set; } = new List<Entity>();
+        public T? FindLocalById<T>(Guid id) where T : Entity
         {
-            if (!Entities.Contains(e)) Entities.Add(e);
+            var matches = Entities.OfType<T>().Where(e => e.Id == id).ToList();
+
+            if (matches.Count > 1)
+            {
+                //help me detect if we run into an issue of multiple of the same object loaded
+                throw new InvalidOperationException($"CRITICAL: Identity Map corruption! Multiple instances of {typeof(T).Name} found with ID {id}.");
+            }
+
+            return matches.FirstOrDefault();
+        }
+
+        public List<T> FindAllLocalByParams<T>(Dictionary<string, object?>? parameters) where T : Entity
+        {
+            if (parameters == null || !parameters.Any())
+            {
+                return Entities.OfType<T>().ToList();
+            }
+
+            return Entities.OfType<T>().Where(entity =>
+            {
+                var entityType = entity.GetType();
+                foreach (var kvp in parameters)
+                {
+                    var prop = entityType.GetProperty(kvp.Key);
+                    if (prop == null) return false;
+
+                    var entityVal = prop.GetValue(entity);
+                    if (!Equals(entityVal, kvp.Value)) return false;
+                }
+                return true;
+            }).ToList();
+        }
+
+        public void InsertToEntities(Entity incoming)
+        {
+            var existing = FindLocalById<Entity>(incoming.Id);
+
+            if (existing == null)
+            {
+                Entities.Add(incoming);
+            }
         }
 
         public void RemoveFromEntities(Entity e) 
